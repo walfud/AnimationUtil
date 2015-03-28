@@ -147,17 +147,23 @@ public class Animator {
                       int startOffset, int duration,
                       Animation.AnimationListener listener) {
 
+        // In case of 'RELATIVE_TO_SELF' or 'RELATIVE_TO_PARENT',
+        // the Scale Algorithm is follow:
+        //   We take the X coordinate as example,
+        //   First get the pivot value: `pivotX` = `left` value + `width * pivotXValue`
+        //   You must know that the scale value is relative to pivot. So we'd get the
+        // 'original distance'(left as example) relative to pivot: `left - pivotX`.
+        //   Then, calculate scale value: `new distance` = `original distance` * `pivotValue`.
+        //   Now we can get the right position after animation: `pivotX` + `new distance`.
+        // Have fun!
+
         final int newWidth = (int) Math.abs(mTargetView.getWidth() * toX);
         final int newHeight = (int) Math.abs(mTargetView.getHeight() * toY);
 
         int pivotX = 0;
         switch (pivotXType) {
             case Animation.ABSOLUTE:
-                if (toX >= 0) {
-                    pivotX = mTargetView.getLeft() + (newWidth / 2);
-                } else {
-                    pivotX = mTargetView.getLeft() - (newWidth / 2);
-                }
+                pivotX = mTargetView.getLeft();
                 break;
 
             case Animation.RELATIVE_TO_SELF:
@@ -179,11 +185,7 @@ public class Animator {
         int pivotY = 0;
         switch (pivotYType) {
             case Animation.ABSOLUTE:
-                if (toY >= 0) {
-                    pivotY = mTargetView.getTop() + (newHeight / 2);
-                } else {
-                    pivotY = mTargetView.getTop() - (newHeight / 2);
-                }
+                pivotY = mTargetView.getTop();
                 break;
 
             case Animation.RELATIVE_TO_SELF:
