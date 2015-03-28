@@ -190,16 +190,10 @@ public class Animator {
     }
     public void mirrorLeft(int startOffset, int duration,
                            Animation.AnimationListener listener) {
-
-        final int newLeft = mTargetView.getLeft() - mTargetView.getWidth();
-        final int newTop = mTargetView.getTop();
-        final int newRight = newLeft +  mTargetView.getWidth();
-        final int newBottom = mTargetView.getBottom();
-
         scale(1.0, -1.0, 1.0, 1.0,
                 Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 0.0,
                 startOffset, duration,
-                new TranslateListener(newLeft, newTop, newRight, newBottom, mTargetView, listener));
+                listener);
     }
     public void mirrorCenterX(boolean reverse,
                               int startOffset, int duration,
@@ -210,29 +204,17 @@ public class Animator {
     }
     public void mirrorRight(int startOffset, int duration,
                             Animation.AnimationListener listener) {
-
-        final int newLeft = mTargetView.getLeft() + mTargetView.getWidth();
-        final int newTop = mTargetView.getTop();
-        final int newRight = newLeft + mTargetView.getWidth();
-        final int newBottom = mTargetView.getBottom();
-
         scale(1.0, -1.0, 1.0, 1.0,
                 Animation.RELATIVE_TO_SELF, 1.0, Animation.RELATIVE_TO_SELF, 0.0,
                 startOffset, duration,
-                new TranslateListener(newLeft, newTop, newRight, newBottom, mTargetView, listener));
+                listener);
     }
     public void mirrorTop(int startOffset, int duration,
                           Animation.AnimationListener listener) {
-
-        final int newLeft = mTargetView.getLeft();
-        final int newTop = mTargetView.getTop() - mTargetView.getHeight();
-        final int newRight = mTargetView.getRight();
-        final int newBottom = newTop + mTargetView.getHeight();
-
         scale(1.0, 1.0, 1.0, -1.0,
                 Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 0.0,
                 startOffset, duration,
-                new TranslateListener(newLeft, newTop, newRight, newBottom, mTargetView, listener));
+                listener);
     }
     public void mirrorCenterY(boolean reverse,
                               int startOffset, int duration,
@@ -243,27 +225,24 @@ public class Animator {
     }
     public void mirrorBottom(int startOffset, int duration,
                              Animation.AnimationListener listener) {
-
-        final int newLeft = mTargetView.getLeft();
-        final int newTop = mTargetView.getTop() + mTargetView.getHeight();
-        final int newRight = mTargetView.getRight();
-        final int newBottom = newTop + mTargetView.getHeight();
-
         scale(1.0, 1.0, 1.0, -1.0,
                 Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 1.0,
                 startOffset, duration,
-                new TranslateListener(newLeft, newTop, newRight, newBottom, mTargetView, listener));
+                listener);
     }
 
-//    // Rotate
-//    public void rotateLeftTop(double fromDegrees, double toDegrees,
-//                              int startOffset, int duration,
-//                              Animation.AnimationListener listener) {
+    // Rotate
+    public void rotateLeftTop(double fromDegrees, double toDegrees,
+                              int startOffset, int duration,
+                              Animation.AnimationListener listener) {
+
+//        int pivotX = calculatePivotX(mTargetView, Animation.ABSOLUTE, 0.0);
+//        final int newLeft = (int) (pivotX + (mTargetView.getLeft() - pivotX) * Math.cos());
+//        final int newRight = (int) (pivotX + (mTargetView.getRight() - pivotX) * toX);
 //
-//        final int newLeft = mTargetView.getLeft() + toX;
-//        final int newTop = mTargetView.getTop() + toY;
-//        final int newRight = mTargetView.getRight() + toX;
-//        final int newBottom = mTargetView.getRight() + toY;
+//        int pivotY = calculatePivotY(mTargetView, pivotYType, pivotYValue);
+//        final int newTop = (int) (pivotY + (mTargetView.getTop() - pivotY) * toY);
+//        final int newBottom = (int) (pivotY + (mTargetView.getBottom() - pivotY) * toY);
 //
 //        Animation rotateAnimation = newRotateAnimation(
 //                fromDegrees, toDegrees,
@@ -273,7 +252,7 @@ public class Animator {
 //                        new ClearAnimationListener(mTargetView, listener)));
 //
 //        mTargetView.startAnimation(rotateAnimation);
-//    }
+    }
 
     ////////////////////// Create an animation object.
     public static Animation newAlphaAnimation(double from, double to,
