@@ -162,17 +162,20 @@ public class Animator {
 
             case Animation.RELATIVE_TO_SELF:
                 pivotX = mTargetView.getLeft()
-                        + ((int) (mTargetView.getWidth() * toX)) / 2;       // newWidth / 2
+                        + (int) (mTargetView.getWidth() * pivotXValue);
                 break;
 
             case Animation.RELATIVE_TO_PARENT:
                 pivotX = ((ViewGroup) mTargetView.getParent()).getLeft()
-                        + ((int) (((ViewGroup) mTargetView.getParent()).getWidth() * toX)) / 2; // newWidth / 2
+                        + (int) (((ViewGroup) mTargetView.getParent()).getWidth() * pivotXValue);
                 break;
 
             default:
                 break;
         }
+        final int newLeft = (int) (pivotX + (mTargetView.getLeft() - pivotX) * toX);
+        final int newRight = (int) (pivotX + (mTargetView.getRight() - pivotX) * toX);
+
         int pivotY = 0;
         switch (pivotYType) {
             case Animation.ABSOLUTE:
@@ -185,29 +188,32 @@ public class Animator {
 
             case Animation.RELATIVE_TO_SELF:
                 pivotY = mTargetView.getTop()
-                        + ((int) (mTargetView.getHeight() * toY)) / 2;      // newHeiht / 2
+                        + (int) (mTargetView.getHeight() * pivotYValue);
                 break;
 
             case Animation.RELATIVE_TO_PARENT:
                 pivotY = ((ViewGroup) mTargetView.getParent()).getHeight()
-                        + ((int) (((ViewGroup) mTargetView.getParent()).getHeight() * toY)) / 2;
+                        + (int) (((ViewGroup) mTargetView.getParent()).getHeight() * pivotYValue);
                 break;
 
             default:
                 break;
         }
+        final int newTop = (int) (pivotY + (mTargetView.getTop() - pivotY) * toY);
+        final int newBottom = (int) (pivotY + (mTargetView.getBottom() - pivotY) * toY);
 
-        int newLeft = pivotX - newWidth/2;
-        int newTop = pivotY - newHeight/2;
-        int newRight = newLeft + newWidth;
-        int newBottom = newTop + newHeight;
+        // Fix 'left > right' or 'top > bottom'
+        final int fixedNewLeft = Math.min(newLeft, newRight);
+        final int fixedNewRight = Math.max(newLeft, newRight);
+        final int fixedNewTop = Math.min(newTop, newBottom);
+        final int fixedNewBottom = Math.max(newTop, newBottom);
 
         Animation scaleAnimation = newScaleAnimation(
                 fromX, toX, fromY, toY,
                 pivotXType, pivotXValue, pivotYType, pivotYValue,
                 startOffset, duration,
                 new ClearAnimationListener(
-                        new TranslateListener(newLeft, newTop, newRight, newBottom, mTargetView, listener)));
+                        new TranslateListener(fixedNewLeft, fixedNewTop, fixedNewRight, fixedNewBottom, mTargetView, listener)));
 
         mTargetView.startAnimation(scaleAnimation);
 
@@ -225,9 +231,10 @@ public class Animator {
                 startOffset, duration,
                 new TranslateListener(newLeft, newTop, newRight, newBottom, mTargetView, listener));
     }
-    public void mirrorCenterX(int startOffset, int duration,
+    public void mirrorCenterX(boolean reverse,
+                              int startOffset, int duration,
                               Animation.AnimationListener listener) {
-        scale(0.0, 1.0, 1.0, 1.0,
+        scale(!reverse ? 1.0 : -1.0, !reverse ? -1.0 : 1.0, 1.0, 1.0,
                 Animation.RELATIVE_TO_SELF, 0.5, Animation.RELATIVE_TO_SELF, 0.0,
                 startOffset, duration, listener);
     }
@@ -257,9 +264,10 @@ public class Animator {
                 startOffset, duration,
                 new TranslateListener(newLeft, newTop, newRight, newBottom, mTargetView, listener));
     }
-    public void mirrorCenterY(int startOffset, int duration,
+    public void mirrorCenterY(boolean reverse,
+                              int startOffset, int duration,
                               Animation.AnimationListener listener) {
-        scale(1.0, 1.0, 0.0, 1.0,
+        scale(1.0, 1.0, !reverse ? 1.0 : -1.0, !reverse ? -1.0 : 1.0,
                 Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 0.5,
                 startOffset, duration, listener);
     }

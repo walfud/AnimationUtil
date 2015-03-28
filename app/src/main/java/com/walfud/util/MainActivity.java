@@ -1,24 +1,15 @@
 package com.walfud.util;
 
-import com.walfud.util.animation.Animator;
-
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
-import android.view.animation.TranslateAnimation;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
+
+import com.walfud.util.animation.Animator;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -58,6 +49,8 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    boolean mCenterXReverse = false;
+    boolean mCenterYReverse = false;
     public void onClick(View v) {
 
         final int START_OFFSET = 0;
@@ -101,8 +94,8 @@ public class MainActivity extends ActionBarActivity {
             break;
 
             case R.id.btn_scale: {
-                animator.scale(1.0, 1.0, 0.0, 1.0,
-                        Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 0.5,
+                animator.scale(1.0, 2.0, 1.0, 2.0,
+                        Animation.RELATIVE_TO_SELF, 0.5, Animation.RELATIVE_TO_SELF, 0.5,
                         START_OFFSET, DURATION, LISTENER);
             }
             break;
@@ -111,7 +104,7 @@ public class MainActivity extends ActionBarActivity {
             }
             break;
             case R.id.btn_mirrorCenterX: {
-                animator.mirrorCenterX(START_OFFSET, DURATION, LISTENER);
+                animator.mirrorCenterX(mCenterXReverse = !mCenterXReverse, START_OFFSET, DURATION, LISTENER);
             }
             break;
             case R.id.btn_mirrorRight: {
@@ -123,7 +116,7 @@ public class MainActivity extends ActionBarActivity {
             }
             break;
             case R.id.btn_mirrorCenterY: {
-                animator.mirrorCenterY(START_OFFSET, DURATION, LISTENER);
+                animator.mirrorCenterY(mCenterYReverse = !mCenterYReverse, START_OFFSET, DURATION, LISTENER);
             }
             break;
             case R.id.btn_mirrorBottom: {
@@ -132,48 +125,8 @@ public class MainActivity extends ActionBarActivity {
             break;
 
             default: {
-
-                Animation animation = new ScaleAnimation((float) 2.0, (float) 3.0, (float) 1.0, (float) 1.0,
-                        Animation.RELATIVE_TO_SELF, (float) 0.0, Animation.RELATIVE_TO_SELF, (float) 0.0);
-                animation.setFillBefore(false);
-                animation.setFillEnabled(true);
-                animation.setFillAfter(true);
-                animation.setStartOffset(0);
-                animation.setDuration(DURATION);
-                animation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-
-                        final int newLeft = mDemo.getLeft() - mDemo.getWidth();
-                        final int newTop = mDemo.getTop();
-                        final int newRight = mDemo.getRight() - mDemo.getWidth();
-                        final int newBottom = mDemo.getBottom();
-
-                        mDemo.clearAnimation();
-
-                        final int newLeft2 = mDemo.getLeft() - mDemo.getWidth();
-                        final int newTop2 = mDemo.getTop();
-                        final int newRight2 = mDemo.getRight() - mDemo.getWidth();
-                        final int newBottom2 = mDemo.getBottom();
-//                        mDemo.setVisibility(View.INVISIBLE);
-//                        mDemo.layout(newLeft, newTop, newRight, newBottom);
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-                mDemo.startAnimation(animation);
             }
                 break;
         }
     }
-
 }
