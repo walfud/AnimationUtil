@@ -104,9 +104,6 @@ public class Animator {
 
         mTargetView.startAnimation(translateAnimation);
     }
-    public void shakeH(int repeatCount, int startOffset, int duration, final Animation.AnimationListener listener) {
-
-    }
     public void shakeH(int[] proc, int startOffset, int duration, final Animation.AnimationListener listener) {
 
         AnimationSet animationSet = new AnimationSet(true);
@@ -219,6 +216,12 @@ public class Animator {
 
         mTargetView.startAnimation(scaleAnimation);
 
+    }
+    public void scaleCenter(double from, double to, int startOffset, int duration,
+                        Animation.AnimationListener listener) {
+        scale(from, to, from, to,
+                Animation.RELATIVE_TO_SELF, 0.5, Animation.RELATIVE_TO_SELF, 0.5,
+                startOffset, duration, listener);
     }
     public void mirrorLeft(int startOffset, int duration,
                            Animation.AnimationListener listener) {

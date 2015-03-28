@@ -94,9 +94,7 @@ public class MainActivity extends ActionBarActivity {
             break;
 
             case R.id.btn_scale: {
-                animator.scale(0.0, -1.0, 1.0, 1.0,
-                        Animation.RELATIVE_TO_SELF, 0.5, Animation.RELATIVE_TO_SELF, 0.5,
-                        START_OFFSET, DURATION, LISTENER);
+                animator.scaleCenter(1.0, 2.0, START_OFFSET, DURATION, LISTENER);
             }
             break;
             case R.id.btn_mirrorLeft: {
