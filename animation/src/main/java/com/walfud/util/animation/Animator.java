@@ -5,8 +5,12 @@ import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
+import android.view.animation.RotateAnimation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
+
+import java.util.AbstractMap;
+import java.util.Map;
 
 /**
  * Created by song on 15-3-24.
@@ -154,50 +158,11 @@ public class Animator {
         //   Now we can get the right position after animation: `pivotX` + `new distance`.
         // Have fun!
 
-        final int newWidth = (int) Math.abs(mTargetView.getWidth() * toX);
-        final int newHeight = (int) Math.abs(mTargetView.getHeight() * toY);
-
-        int pivotX = 0;
-        switch (pivotXType) {
-            case Animation.ABSOLUTE:
-                pivotX = mTargetView.getLeft();
-                break;
-
-            case Animation.RELATIVE_TO_SELF:
-                pivotX = mTargetView.getLeft()
-                        + (int) (mTargetView.getWidth() * pivotXValue);
-                break;
-
-            case Animation.RELATIVE_TO_PARENT:
-                pivotX = ((ViewGroup) mTargetView.getParent()).getLeft()
-                        + (int) (((ViewGroup) mTargetView.getParent()).getWidth() * pivotXValue);
-                break;
-
-            default:
-                break;
-        }
+        int pivotX = calculatePivotX(mTargetView, pivotXType, pivotXValue);
         final int newLeft = (int) (pivotX + (mTargetView.getLeft() - pivotX) * toX);
         final int newRight = (int) (pivotX + (mTargetView.getRight() - pivotX) * toX);
 
-        int pivotY = 0;
-        switch (pivotYType) {
-            case Animation.ABSOLUTE:
-                pivotY = mTargetView.getTop();
-                break;
-
-            case Animation.RELATIVE_TO_SELF:
-                pivotY = mTargetView.getTop()
-                        + (int) (mTargetView.getHeight() * pivotYValue);
-                break;
-
-            case Animation.RELATIVE_TO_PARENT:
-                pivotY = ((ViewGroup) mTargetView.getParent()).getHeight()
-                        + (int) (((ViewGroup) mTargetView.getParent()).getHeight() * pivotYValue);
-                break;
-
-            default:
-                break;
-        }
+        int pivotY = calculatePivotY(mTargetView, pivotYType, pivotYValue);
         final int newTop = (int) (pivotY + (mTargetView.getTop() - pivotY) * toY);
         final int newBottom = (int) (pivotY + (mTargetView.getBottom() - pivotY) * toY);
 
@@ -290,6 +255,26 @@ public class Animator {
                 new TranslateListener(newLeft, newTop, newRight, newBottom, mTargetView, listener));
     }
 
+//    // Rotate
+//    public void rotateLeftTop(double fromDegrees, double toDegrees,
+//                              int startOffset, int duration,
+//                              Animation.AnimationListener listener) {
+//
+//        final int newLeft = mTargetView.getLeft() + toX;
+//        final int newTop = mTargetView.getTop() + toY;
+//        final int newRight = mTargetView.getRight() + toX;
+//        final int newBottom = mTargetView.getRight() + toY;
+//
+//        Animation rotateAnimation = newRotateAnimation(
+//                fromDegrees, toDegrees,
+//                Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 0.0,
+//                startOffset, duration,
+//                new TranslateListener(newLeft, newTop, newRight, newBottom,
+//                        new ClearAnimationListener(mTargetView, listener)));
+//
+//        mTargetView.startAnimation(rotateAnimation);
+//    }
+
     ////////////////////// Create an animation object.
     public static Animation newAlphaAnimation(double from, double to,
                                         int startOffset, int duration,
@@ -344,6 +329,14 @@ public class Animator {
                 new ScaleAnimation((float) fromX, (float) toX, (float) fromY, (float) toY, pivotXType, (float) pivotXValue, pivotYType, (float) pivotYValue),
                 startOffset, duration, listener);
     }
+    public static Animation newRotateAnimation(double fromDegrees, double toDegrees,
+                                               int pivotXType, double pivotXValue, int pivotYType, double pivotYValue,
+                                               int startOffset, int duration,
+                                               Animation.AnimationListener listener) {
+        return autoFillAnimationFields(
+                new RotateAnimation((float) fromDegrees, (float) toDegrees, pivotXType, (float) pivotXValue, pivotYType, (float) pivotYValue),
+                startOffset, duration, listener);
+    }
 
     private static Animation autoFillAnimationFields(Animation animation, int startOffset, int duration, Animation.AnimationListener listener) {
         animation.setStartOffset(startOffset);
@@ -357,6 +350,63 @@ public class Animator {
         animation.setAnimationListener(listener);
 
         return animation;
+    }
+    private static int calculatePivot(int startValue, int length, int pivotType, double pivotValue) {
+        int pivot = 0;
+
+        switch (pivotType) {
+            case Animation.ABSOLUTE:
+                pivot = startValue;
+                break;
+
+            case Animation.RELATIVE_TO_SELF:
+            case Animation.RELATIVE_TO_PARENT:
+                pivot = startValue + (int) (length * pivotValue);
+                break;
+
+            default:
+                break;
+        }
+
+        return pivot;
+    }
+    private static int calculatePivotX(View view, int pivotXType, double pivotXValue) {
+        int pivotX = 0;
+        switch (pivotXType) {
+            case Animation.ABSOLUTE:
+            case Animation.RELATIVE_TO_SELF:
+                pivotX = calculatePivot(view.getLeft(), view.getWidth(),
+                        pivotXType, pivotXValue);
+                break;
+
+            case Animation.RELATIVE_TO_PARENT:
+                pivotX = calculatePivot(((ViewGroup) view.getParent()).getLeft(), ((ViewGroup) view.getParent()).getWidth(),
+                        pivotXType, pivotXValue);
+                break;
+
+            default:
+                break;
+        }
+        return pivotX;
+    }
+    private static int calculatePivotY(View view, int pivotYType, double pivotYValue) {
+        int pivotY = 0;
+        switch (pivotYType) {
+            case Animation.ABSOLUTE:
+            case Animation.RELATIVE_TO_SELF:
+                pivotY = calculatePivot(view.getTop(), view.getHeight(),
+                        pivotYType, pivotYValue);
+                break;
+
+            case Animation.RELATIVE_TO_PARENT:
+                pivotY = calculatePivot(((ViewGroup) view.getParent()).getTop(), view.getHeight(),
+                        pivotYType, pivotYValue);
+                break;
+
+            default:
+                break;
+        }
+        return pivotY;
     }
 
     ///////////////////
