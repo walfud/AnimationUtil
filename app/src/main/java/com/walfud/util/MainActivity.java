@@ -7,7 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.ScaleAnimation;
+import android.view.animation.RotateAnimation;
 
 import com.walfud.util.animation.Animator;
 
@@ -122,7 +122,18 @@ public class MainActivity extends ActionBarActivity {
             }
             break;
 
+            case R.id.btn_rotateLeftTop: {
+                animator.rotateLeftTop(mDemo.getRotation(), mDemo.getRotation() + 30.0, START_OFFSET, DURATION, LISTENER);
+            }
+                break;
+
             default: {
+
+                Log.d(TAG, "begin: " + mDemo.getRotation());
+                mDemo.setRotation(mDemo.getRotation() + 30);
+
+                Log.d(TAG, "end: " + mDemo.getRotation());
+
             }
                 break;
         }

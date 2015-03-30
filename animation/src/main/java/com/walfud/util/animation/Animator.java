@@ -1,5 +1,6 @@
 package com.walfud.util.animation;
 
+import android.graphics.Point;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
@@ -92,19 +93,16 @@ public class Animator {
      */
     public void translate(int fromX, final int toX, int fromY, final int toY, int startOffset, int duration, final Animation.AnimationListener listener) {
 
-        final int origVisibility = mTargetView.getVisibility();
-
         //
         final int newLeft = mTargetView.getLeft() + toX;
         final int newTop = mTargetView.getTop() + toY;
         final int newRight = mTargetView.getRight() + toX;
-        final int newBottom = mTargetView.getRight() + toY;
+        final int newBottom = mTargetView.getBottom() + toY;
 
         // Animation
         Animation translateAnimation = newTranslateAnimation(fromX, toX, fromY, toY, startOffset, duration,
-                new VisibilityAnimationListener(View.INVISIBLE, origVisibility,
-                        new TranslateListener(newLeft, newTop, newRight, newBottom,
-                                new ClearAnimationListener(mTargetView, listener))));
+                new TranslateListener(newLeft, newTop, newRight, newBottom,
+                        new ClearAnimationListener(mTargetView, listener)));
 
         mTargetView.startAnimation(translateAnimation);
     }
@@ -232,26 +230,58 @@ public class Animator {
     }
 
     // Rotate
-    public void rotateLeftTop(double fromDegrees, double toDegrees,
+    public void rotateLeftTop(final double fromDegrees, final double toDegrees,
                               int startOffset, int duration,
                               Animation.AnimationListener listener) {
 
-//        int pivotX = calculatePivotX(mTargetView, Animation.ABSOLUTE, 0.0);
-//        final int newLeft = (int) (pivotX + (mTargetView.getLeft() - pivotX) * Math.cos());
-//        final int newRight = (int) (pivotX + (mTargetView.getRight() - pivotX) * toX);
-//
-//        int pivotY = calculatePivotY(mTargetView, pivotYType, pivotYValue);
-//        final int newTop = (int) (pivotY + (mTargetView.getTop() - pivotY) * toY);
-//        final int newBottom = (int) (pivotY + (mTargetView.getBottom() - pivotY) * toY);
-//
-//        Animation rotateAnimation = newRotateAnimation(
-//                fromDegrees, toDegrees,
-//                Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 0.0,
-//                startOffset, duration,
-//                new TranslateListener(newLeft, newTop, newRight, newBottom,
-//                        new ClearAnimationListener(mTargetView, listener)));
-//
-//        mTargetView.startAnimation(rotateAnimation);
+        final int pivotX = calculatePivotX(mTargetView, Animation.ABSOLUTE, 0.0);
+        final int pivotY = calculatePivotY(mTargetView, Animation.ABSOLUTE, 0.0);
+        final Point newLeftTop = pointRotate(
+                                    new Point(pivotX, pivotY),
+                                    new Point(mTargetView.getLeft(), mTargetView.getTop()),
+                                    toDegrees);
+//        final Point newRightTop = pointRotate(new Point(pivotX, pivotY),
+//                new Point(mTargetView.getRight(), mTargetView.getTop()),
+//                toDegrees);
+//        final Point newLeftBottom = pointRotate(new Point(pivotX, pivotY),
+//                new Point(mTargetView.getLeft(), mTargetView.getBottom()),
+//                toDegrees);
+        final Point newRightBottom = pointRotate(
+                                        new Point(pivotX, pivotY),
+                                        new Point(mTargetView.getRight(), mTargetView.getBottom()),
+                                        toDegrees);
+
+        // Equivalent pre-rotation position.
+        final int centerX = (newLeftTop.x + newRightBottom.x) / 2;
+        final int centerY = (newLeftTop.y + newRightBottom.y) / 2;
+        final int prerotationLeft = centerX - mTargetView.getWidth() / 2;
+        final int prerotationRight = centerX + mTargetView.getWidth() / 2;
+        final int prerotationTop = centerY - mTargetView.getHeight() / 2;
+        final int prerotationBottom = centerY + mTargetView.getHeight() / 2;
+
+        Animation rotateAnimation = newRotateAnimation(
+                fromDegrees, toDegrees,
+                Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 0.0,
+                startOffset, duration,
+                new ClearAnimationListener(mTargetView, listener) {
+
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        mTargetView.setRotation((float) fromDegrees);
+
+                        super.onAnimationStart(animation);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        mTargetView.layout(prerotationLeft, prerotationTop, prerotationRight, prerotationBottom);
+                        mTargetView.setRotation((float) toDegrees);
+
+                        super.onAnimationEnd(animation);
+                    }
+                });
+
+        mTargetView.startAnimation(rotateAnimation);
     }
 
     ////////////////////// Create an animation object.
@@ -386,6 +416,15 @@ public class Animator {
                 break;
         }
         return pivotY;
+    }
+    private static Point pointRotate(Point o, Point target, double toDegrees) {
+        final int r = (int) Math.sqrt(Math.pow(target.x - o.x, 2.0) + Math.pow(target.y - o.y, 2.0));
+        final double finalDegrees = Math.toDegrees(Math.atan((double) (target.y - o.y) / (double) (target.x - o.x))) + toDegrees;
+
+        final Point finalPoint = new Point();
+        finalPoint.x = o.x + (int) (r * Math.cos(Math.toRadians(finalDegrees)));
+        finalPoint.y = o.y + (int) (r * Math.sin(Math.toRadians(finalDegrees)));
+        return finalPoint;
     }
 
     ///////////////////
