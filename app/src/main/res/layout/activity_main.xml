@@ -14,7 +14,7 @@
         android:onClick="onClick"
         android:background="@color/button_material_dark"
         android:scaleType="fitXY"
-        android:src="@mipmap/ic_launcher"/>
+        android:src="@drawable/demo"/>
 
     <LinearLayout
         android:layout_alignParentBottom="true"

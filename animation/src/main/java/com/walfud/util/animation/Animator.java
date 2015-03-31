@@ -10,9 +10,6 @@ import android.view.animation.RotateAnimation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 
-import java.util.AbstractMap;
-import java.util.Map;
-
 /**
  * Created by song on 15-3-24.
  */
@@ -234,30 +231,50 @@ public class Animator {
                               int startOffset, int duration,
                               Animation.AnimationListener listener) {
 
-        final int pivotX = calculatePivotX(mTargetView, Animation.ABSOLUTE, 0.0);
-        final int pivotY = calculatePivotY(mTargetView, Animation.ABSOLUTE, 0.0);
-        final Point newLeftTop = pointRotate(
-                                    new Point(pivotX, pivotY),
-                                    new Point(mTargetView.getLeft(), mTargetView.getTop()),
-                                    toDegrees);
-//        final Point newRightTop = pointRotate(new Point(pivotX, pivotY),
-//                new Point(mTargetView.getRight(), mTargetView.getTop()),
-//                toDegrees);
-//        final Point newLeftBottom = pointRotate(new Point(pivotX, pivotY),
-//                new Point(mTargetView.getLeft(), mTargetView.getBottom()),
-//                toDegrees);
-        final Point newRightBottom = pointRotate(
-                                        new Point(pivotX, pivotY),
-                                        new Point(mTargetView.getRight(), mTargetView.getBottom()),
-                                        toDegrees);
+        // Common status.
+        final int width = mTargetView.getWidth();
+        final int height = mTargetView.getHeight();
+        final double centerAngleDegrees = Math.toDegrees(Math.atan2(height, width));
+
+        // Current status.
+        final int currentLeft = mTargetView.getLeft();
+        final int currentTop = mTargetView.getTop();
+        final int currentRight = mTargetView.getRight();
+        final int currentBottom = mTargetView.getBottom();
+        final int currentCenterX = (currentLeft + currentRight) / 2;
+        final int currentCenterY = (currentTop + currentBottom) / 2;
+        final double currentDegrees = mTargetView.getRotation();
+
+        // O point.
+        final int r = (int) Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) / 2;
+        final double oDegrees = centerAngleDegrees + currentDegrees;
+        final int oX = (int) (currentCenterX - r * Math.cos(Math.toRadians(oDegrees)));
+        final int oY = (int) (currentCenterY - r * Math.sin(Math.toRadians(oDegrees)));
+
+        // Calculate original position( degree is 0 ).
+        final Point origCenter = pointRotate(new Point(oX, oY), new Point(currentCenterX, currentCenterY), -currentDegrees);
+        final int origLeft = origCenter.x - width / 2;
+        final int origTop = origCenter.y - height / 2;
+        final int origRight = origLeft + width;
+        final int origBottom = origTop + height;
+
+        // Calculate the finish position and rotation from original.
+        final Point finishLeftTop = pointRotate(
+                new Point(oX, oY),
+                new Point(origLeft, origTop),
+                toDegrees);
+        final Point finishRightBottom = pointRotate(
+                new Point(oX, oY),
+                new Point(origRight, origBottom),
+                toDegrees);
 
         // Equivalent pre-rotation position.
-        final int centerX = (newLeftTop.x + newRightBottom.x) / 2;
-        final int centerY = (newLeftTop.y + newRightBottom.y) / 2;
-        final int prerotationLeft = centerX - mTargetView.getWidth() / 2;
-        final int prerotationRight = centerX + mTargetView.getWidth() / 2;
-        final int prerotationTop = centerY - mTargetView.getHeight() / 2;
-        final int prerotationBottom = centerY + mTargetView.getHeight() / 2;
+        final int finishCenterX = (finishLeftTop.x + finishRightBottom.x) / 2;
+        final int finishCenterY = (finishLeftTop.y + finishRightBottom.y) / 2;
+        final int finishLeft = finishCenterX - width / 2;
+        final int finishTop = finishCenterY - height / 2;
+        final int finishRight = finishLeft + width;
+        final int finishBottom = finishTop + height;
 
         Animation rotateAnimation = newRotateAnimation(
                 fromDegrees, toDegrees,
@@ -267,14 +284,18 @@ public class Animator {
 
                     @Override
                     public void onAnimationStart(Animation animation) {
-                        mTargetView.setRotation((float) fromDegrees);
+
+                        // Reset the view to original position.
+                        mTargetView.layout(origLeft, origTop, origRight, origBottom);
+                        mTargetView.setRotation(0);
 
                         super.onAnimationStart(animation);
                     }
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        mTargetView.layout(prerotationLeft, prerotationTop, prerotationRight, prerotationBottom);
+
+                        mTargetView.layout(finishLeft, finishTop, finishRight, finishBottom);
                         mTargetView.setRotation((float) toDegrees);
 
                         super.onAnimationEnd(animation);
@@ -419,7 +440,7 @@ public class Animator {
     }
     private static Point pointRotate(Point o, Point target, double toDegrees) {
         final int r = (int) Math.sqrt(Math.pow(target.x - o.x, 2.0) + Math.pow(target.y - o.y, 2.0));
-        final double finalDegrees = Math.toDegrees(Math.atan((double) (target.y - o.y) / (double) (target.x - o.x))) + toDegrees;
+        final double finalDegrees = Math.toDegrees(Math.atan2(target.y - o.y, target.x - o.x)) + toDegrees;
 
         final Point finalPoint = new Point();
         finalPoint.x = o.x + (int) (r * Math.cos(Math.toRadians(finalDegrees)));

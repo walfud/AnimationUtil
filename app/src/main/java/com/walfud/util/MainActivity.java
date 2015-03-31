@@ -124,6 +124,7 @@ public class MainActivity extends ActionBarActivity {
 
             case R.id.btn_rotateLeftTop: {
                 animator.rotateLeftTop(mDemo.getRotation(), mDemo.getRotation() + 30.0, START_OFFSET, DURATION, LISTENER);
+//                animator.rotateLeftTop(0, 30.0, START_OFFSET, DURATION, LISTENER);
             }
                 break;
 
@@ -131,8 +132,9 @@ public class MainActivity extends ActionBarActivity {
 
                 Log.d(TAG, "begin: " + mDemo.getRotation());
                 mDemo.setRotation(mDemo.getRotation() + 30);
-
                 Log.d(TAG, "end: " + mDemo.getRotation());
+                Log.d(TAG, String.format("left(%d), top(%d), right(%d), bottom(%d)",
+                        mDemo.getLeft(), mDemo.getTop(), mDemo.getRight(), mDemo.getBottom()));
 
             }
                 break;
