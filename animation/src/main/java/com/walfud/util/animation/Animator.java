@@ -231,32 +231,31 @@ public class Animator {
                               int startOffset, int duration,
                               Animation.AnimationListener listener) {
 
-        // Common status.
-        final int width = mTargetView.getWidth();
-        final int height = mTargetView.getHeight();
-        final double centerAngleDegrees = Math.toDegrees(Math.atan2(height, width));
-
         // Current status.
+        final int currentWidth = mTargetView.getWidth();
+        final int currentHeight = mTargetView.getHeight();
         final int currentLeft = mTargetView.getLeft();
         final int currentTop = mTargetView.getTop();
         final int currentRight = mTargetView.getRight();
         final int currentBottom = mTargetView.getBottom();
         final int currentCenterX = (currentLeft + currentRight) / 2;
         final int currentCenterY = (currentTop + currentBottom) / 2;
-        final double currentDegrees = mTargetView.getRotation();
+        final int currentDegrees = (int) mTargetView.getRotation();
+        final int currentOPointX = calculatePivotX(mTargetView, Animation.ABSOLUTE, 0);     // pivot X
+        final int currentOPointY = calculatePivotY(mTargetView, Animation.ABSOLUTE, 0);     // pivot Y
 
-        // O point.
-        final int r = (int) Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2)) / 2;
-        final double oDegrees = centerAngleDegrees + currentDegrees;
-        final int oX = (int) (currentCenterX - r * Math.cos(Math.toRadians(oDegrees)));
-        final int oY = (int) (currentCenterY - r * Math.sin(Math.toRadians(oDegrees)));
+        // Get the rotation radius
+        final int initDegrees = (int) Math.toDegrees(Math.atan2(currentCenterY - currentOPointY, currentCenterX - currentOPointX));
+        final int r = calculateDistance(currentCenterX, currentCenterY, currentOPointX, currentOPointY);
+        final int oX = (int) (currentCenterX - r * Math.cos(Math.toRadians(initDegrees + currentDegrees)));
+        final int oY = (int) (currentCenterY - r * Math.sin(Math.toRadians(initDegrees + currentDegrees)));
 
         // Calculate original position( degree is 0 ).
         final Point origCenter = pointRotate(new Point(oX, oY), new Point(currentCenterX, currentCenterY), -currentDegrees);
-        final int origLeft = origCenter.x - width / 2;
-        final int origTop = origCenter.y - height / 2;
-        final int origRight = origLeft + width;
-        final int origBottom = origTop + height;
+        final int origLeft = origCenter.x - currentWidth / 2;
+        final int origTop = origCenter.y - currentHeight / 2;
+        final int origRight = origLeft + currentWidth;
+        final int origBottom = origTop + currentHeight;
 
         // Calculate the finish position and rotation from original.
         final Point finishLeftTop = pointRotate(
@@ -271,10 +270,10 @@ public class Animator {
         // Equivalent pre-rotation position.
         final int finishCenterX = (finishLeftTop.x + finishRightBottom.x) / 2;
         final int finishCenterY = (finishLeftTop.y + finishRightBottom.y) / 2;
-        final int finishLeft = finishCenterX - width / 2;
-        final int finishTop = finishCenterY - height / 2;
-        final int finishRight = finishLeft + width;
-        final int finishBottom = finishTop + height;
+        final int finishLeft = finishCenterX - currentWidth / 2;
+        final int finishTop = finishCenterY - currentHeight / 2;
+        final int finishRight = finishLeft + currentWidth;
+        final int finishBottom = finishTop + currentHeight;
 
         Animation rotateAnimation = newRotateAnimation(
                 fromDegrees, toDegrees,
@@ -368,6 +367,7 @@ public class Animator {
                 startOffset, duration, listener);
     }
 
+    // Utility
     private static Animation autoFillAnimationFields(Animation animation, int startOffset, int duration, Animation.AnimationListener listener) {
         animation.setStartOffset(startOffset);
         animation.setDuration(duration);
@@ -439,13 +439,21 @@ public class Animator {
         return pivotY;
     }
     private static Point pointRotate(Point o, Point target, double toDegrees) {
-        final int r = (int) Math.sqrt(Math.pow(target.x - o.x, 2.0) + Math.pow(target.y - o.y, 2.0));
+        final int r = calculateDistance(target.x, target.y, o.x, o.y);
         final double finalDegrees = Math.toDegrees(Math.atan2(target.y - o.y, target.x - o.x)) + toDegrees;
 
         final Point finalPoint = new Point();
         finalPoint.x = o.x + (int) (r * Math.cos(Math.toRadians(finalDegrees)));
         finalPoint.y = o.y + (int) (r * Math.sin(Math.toRadians(finalDegrees)));
         return finalPoint;
+    }
+    private static int calculateDistance(Point a, Point b) {
+        return (int) Math.sqrt(
+                Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2)
+        );
+    }
+    private static int calculateDistance(int x1, int y1, int x2, int y2) {
+        return calculateDistance(new Point(x1, y1), new Point(x2, y2));
     }
 
     ///////////////////

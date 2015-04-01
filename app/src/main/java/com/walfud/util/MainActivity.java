@@ -130,11 +130,7 @@ public class MainActivity extends ActionBarActivity {
 
             default: {
 
-                Log.d(TAG, "begin: " + mDemo.getRotation());
-                mDemo.setRotation(mDemo.getRotation() + 30);
-                Log.d(TAG, "end: " + mDemo.getRotation());
-                Log.d(TAG, String.format("left(%d), top(%d), right(%d), bottom(%d)",
-                        mDemo.getLeft(), mDemo.getTop(), mDemo.getRight(), mDemo.getBottom()));
+//                Animation animation = new RotateAnimation()
 
             }
                 break;
