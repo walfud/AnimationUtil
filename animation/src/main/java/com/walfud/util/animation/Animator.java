@@ -227,9 +227,10 @@ public class Animator {
     }
 
     // Rotate
-    public void rotateLeftTop(final double fromDegrees, final double toDegrees,
-                              int startOffset, int duration,
-                              Animation.AnimationListener listener) {
+    public void rotate(final double fromDegrees, final double toDegrees,
+                       int pivotXType, double pivotXValue, int pivotYType, double pivotYValue,
+                       int startOffset, int duration,
+                       Animation.AnimationListener listener) {
 
         // Current status.
         final int currentWidth = mTargetView.getWidth();
@@ -241,8 +242,8 @@ public class Animator {
         final int currentCenterX = (currentLeft + currentRight) / 2;
         final int currentCenterY = (currentTop + currentBottom) / 2;
         final int currentDegrees = (int) mTargetView.getRotation();
-        final int currentOPointX = calculatePivotX(mTargetView, Animation.ABSOLUTE, 0);     // pivot X
-        final int currentOPointY = calculatePivotY(mTargetView, Animation.ABSOLUTE, 0);     // pivot Y
+        final int currentOPointX = calculatePivotX(mTargetView, pivotXType, pivotXValue);     // pivot X
+        final int currentOPointY = calculatePivotY(mTargetView, pivotYType, pivotYValue);     // pivot Y
 
         // Get the rotation radius
         final int initDegrees = (int) Math.toDegrees(Math.atan2(currentCenterY - currentOPointY, currentCenterX - currentOPointX));
@@ -277,7 +278,7 @@ public class Animator {
 
         Animation rotateAnimation = newRotateAnimation(
                 fromDegrees, toDegrees,
-                Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 0.0,
+                pivotXType, pivotXValue, pivotYType, pivotYValue,
                 startOffset, duration,
                 new ClearAnimationListener(mTargetView, listener) {
 
@@ -302,6 +303,34 @@ public class Animator {
                 });
 
         mTargetView.startAnimation(rotateAnimation);
+    }
+    public void rotateLeftTop(double fromDegrees, double toDegrees,
+                              int startOffset, int duration,
+                              Animation.AnimationListener listener) {
+        rotate(fromDegrees, toDegrees,
+                Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 0.0,
+                startOffset, duration, listener);
+    }
+    public void rotateRightTop(double fromDegrees, double toDegrees,
+                              int startOffset, int duration,
+                              Animation.AnimationListener listener) {
+        rotate(fromDegrees, toDegrees,
+                Animation.RELATIVE_TO_SELF, 1.0, Animation.RELATIVE_TO_SELF, 0.0,
+                startOffset, duration, listener);
+    }
+    public void rotateLeftBottom(double fromDegrees, double toDegrees,
+                              int startOffset, int duration,
+                              Animation.AnimationListener listener) {
+        rotate(fromDegrees, toDegrees,
+                Animation.RELATIVE_TO_SELF, 0.0, Animation.RELATIVE_TO_SELF, 1.0,
+                startOffset, duration, listener);
+    }
+    public void rotateRightBottom(double fromDegrees, double toDegrees,
+                              int startOffset, int duration,
+                              Animation.AnimationListener listener) {
+        rotate(fromDegrees, toDegrees,
+                Animation.RELATIVE_TO_SELF, 1.0, Animation.RELATIVE_TO_SELF, 1.0,
+                startOffset, duration, listener);
     }
 
     ////////////////////// Create an animation object.

@@ -133,8 +133,43 @@
             android:layout_height="wrap_content">
 
             <Button
+                android:id="@+id/btn_rotate"
+                android:text="rotate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <Button
                 android:id="@+id/btn_rotateLeftTop"
                 android:text="rotateLeftTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"/>
+            <Button
+                android:id="@+id/btn_rotateRightTop"
+                android:text="rotateRightTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/btn_rotateLeftBottom"
+                android:text="rotateLeftBottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"/>
+            <Button
+                android:id="@+id/btn_rotateRightBottom"
+                android:text="rotateRightBottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="onClick"/>
